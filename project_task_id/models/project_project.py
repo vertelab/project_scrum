@@ -3,6 +3,9 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.osv import expression
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class ProjectProject(models.Model):
@@ -10,16 +13,16 @@ class ProjectProject(models.Model):
 
     use_project_no = fields.Boolean(string="Use Project No")
 
+    project_no = fields.Char(string="Project Number", copy=False)
+    task_no_next = fields.Integer(
+        string="Next Task id", copy=False, help="Counter to get unique ids for tasks"
+    )
+
     @api.model
     def set_sequences_numbers_for_all_projects(self):
         records = self.env["project.project"].search([("use_project_no", "=", True), ("project_no", "=", False)])
         for record in records:
             record.project_no = self.env["ir.sequence"].next_by_code("project.project")
-
-    project_no = fields.Char(string="Project Number", copy=False)
-    task_no_next = fields.Integer(
-        string="Next Task id", copy=False, help="Counter to get unique ids for tasks"
-    )
 
     @api.model
     def create(self, vals):
@@ -40,6 +43,40 @@ class ProjectProject(models.Model):
         for record in self:
             if not record.project_no and record.use_project_no:
                 record.project_no = self.env["ir.sequence"].next_by_code("project.project")
+        
+    @api.depends('name',"project_no") 
+    def _compute_display_name(self):
+        
+        parameter = bool(self.env["ir.config_parameter"].sudo().get_param("project.project_sequence"))
+      
+        for project in self:
+
+            if parameter:
+
+                if project.project_no and project.use_project_no:
+
+                    project.display_name = f"[{project.project_no}] {project.name}"
+                    return
+
+            project.display_name = f"{project.name}"
+    
+
+    # @api.depends('name',"project_no") 
+    # def _compute_display_name(self):
+        
+    #     parameter = bool(self.env["ir.config_parameter"].sudo().get_param("project.project_sequence"))
+      
+    #     for record in self:
+
+    #         _logger.error(f"{record=}")
+
+    #         if parameter:
+
+    #             if record.project_no and record.use_project_no:
+    #                 record.display_name = f"[{record.project_no}] {record.name}"
+
+    #         else:
+    #             record.display_name = f"{project.name}"
 
     def name_get(self):
         res_list = []
@@ -56,7 +93,7 @@ class ProjectProject(models.Model):
         return res_list
 
     @api.model
-    def search(self, args, offset=0, limit=80, order='id', count=False):
+    def search(self, args, offset=0, limit=80, order='id'):
         """Override to extend searching project_no when searching name"""
         for arg in args.copy():
             if 'name' in arg:
@@ -69,5 +106,4 @@ class ProjectProject(models.Model):
             offset=offset,
             limit=limit,
             order=order,
-            count=count
         )

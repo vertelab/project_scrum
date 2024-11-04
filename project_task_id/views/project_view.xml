@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="view_project_kanban_nr" model="ir.ui.view">
+        <!-- <record id="view_project_kanban_nr" model="ir.ui.view">
             <field name="name">project.project.kanban</field>
             <field name="model">project.project</field>
             <field name="inherit_id" ref="project.view_project_kanban" />
@@ -9,11 +9,11 @@
                 <field name="name" position="after">
                     <field name="display_name" />
                 </field>
-                <xpath expr="//t[@t-esc='record.name.value']" position="replace">
+                <xpath expr="//t[@t-esc='record.display_name.value']" position="replace">
                     <t t-esc="record.display_name.value"/>
                 </xpath>
             </field>
-        </record>
+        </record> -->
         <record id="view_project_project_filter" model="ir.ui.view">
             <field name="model">project.project</field>
             <field name="inherit_id" ref="project.view_project_project_filter" />
@@ -26,7 +26,7 @@
         <record id="view_task_form2_task_id" model="ir.ui.view">
             <field name="name">project.task.form.task_id</field>
             <field name="model">project.task</field>
-            <field name= "inherit_id"  ref="project.view_task_form2" />
+            <field name= "inherit_id" ref="project.view_task_form2" />
             <field name="arch" type="xml">
                 <field name="name" position="replace">
                     <field name="name" class="oe_edit_only" />
@@ -40,7 +40,7 @@
         <record id="view_task_tree2" model="ir.ui.view">
             <field name="name">project.task.tree.task_no</field>
             <field name="model">project.task</field>
-            <field name= "inherit_id"  ref="project.view_task_tree2" />
+            <field name= "inherit_id" ref="project.view_task_tree2" />
             <field name="arch" type="xml">
                 <field name="name" position="replace">
                     <field name="display_name" />
@@ -50,7 +50,7 @@
         <record id="view_task_search_form" model="ir.ui.view">
             <field name="name">project.task.search.form.task_no</field>
             <field name="model">project.task</field>
-            <field name= "inherit_id"  ref="project.view_task_search_form" />
+            <field name= "inherit_id" ref="project.view_task_search_form" />
             <field name="arch" type="xml">
                 <field name="name" position="after">
                     <field name="task_no" />
@@ -63,16 +63,16 @@
         <record model="ir.ui.view" id="view_task_kanban">
             <field name="name">project.task.kanban</field>
             <field name="model">project.task</field>
-            <field name= "inherit_id"  ref="project.view_task_kanban" />
+            <field name= "inherit_id" ref="project.view_task_kanban" />
             <field name="arch" type="xml">
                 <field name="name" position="replace">
-		    <!--
+                    <!--
 			I have readded the name field but made it invisiable.
 			This is done since project_key tries to x_path to this field
             and crashes if when it can't find it since we have replaced it.
 		    -->
                     <field name="name" invisible="1" groups="base.group_no_one"/>
-		            <field name="display_name" />
+                    <field name="display_name" />
                 </field>
             </field>
         </record>
@@ -82,23 +82,21 @@
             <field name="inherit_id" ref="project.res_config_settings_view_form" />
             <field name="priority" eval="30" />
             <field name="arch" type="xml">
-                <xpath expr="//div[hasclass('settings')]" position="inside">
-                    <div class="app_settings_block" data_string="Task Management" string="Task Management" data-key="project_task_id">
-                        <H2>Task Management</H2>
-                        <div class="row mt16 o_settings_container">
-                            <div class="col-12 col-lg-6 o_setting_box" id="recurring_tasks_setting">
-                                <div class="o_setting_left_pane" />
-                                <div class="">
-                                    <span class="o_form_label">Task Management</span>
-                                    <div class="text-muted">Select task sequence. Sequence at project level or at domain level.</div>
-                                    <div>
-                                        <field name="task_sequence" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+                <xpath expr="//form" position="inside">
+                    <app data_string="Task Management" string="Task Management" name="task_managment" groups="project.group_project_manager">
+                        <block title="Tasks Management" id="tasks_management">
+                            <setting id="recurring_tasks_setting" help="Auto-generate tasks for regular activities">
+                                <field name="task_sequence"/>
+                            </setting>
+                            <setting id="recurring_tasks_setting" help="Auto-generate tasks for regular activities">
+                                <field name="default_use_project_no" />
+                            </setting>
+                        </block>
+                        
+                    </app>
                 </xpath>
+                <!--
                 <xpath expr="//div[@data-key='project']" position="inside">
                         <H2>Project Numbers</H2>
                         <div class="row mt16 o_settings_container">
@@ -113,7 +111,7 @@
                                 </div>
                             </div>
                         </div>
-                </xpath>
+                </xpath> -->
             </field>
         </record>
 
@@ -122,23 +120,18 @@
             <field name="model">project.project</field>
             <field name="inherit_id" ref="project.edit_project"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[@name='options_active']/div[last()]" position="before">
+                <field name="tag_ids" position="after">
+                    <field name="use_project_no" class="oe_inline oe_input_align"/>
+                </field>
+                <!-- <xpath expr="//div[@name='options_active']/div[last()]" position="before">
                     <div>
                         <label for="use_project_no" class="oe_inline" string="Use Project No"/>
                         <field name="use_project_no" class="oe_inline oe_input_align"/>
                     </div>
-<!--
-                    <div>
-                        <label for="project_no" class="oe_inline" string="Project Number"/>
-                        <field name="project_no" class="oe_inline oe_input_align"/>
-                    </div>
--->
-                </xpath>
+                </xpath> -->
                 <field name="name" position="replace">
                     <div>
-                        <span class="oe_inline" attrs="{'invisible':[('use_project_no', '=', False)]}">
-                            [<field name="project_no" class="oe_inline oe_input_align" attrs="{'invisible':[('use_project_no', '=', False)]}"/>]
-                        </span>
+                        [<field name="project_no" class="oe_inline oe_input_align" invisible="use_project_no == False"/>]
                         <field name="name" class="oe_inline"/>
                     </div>
                 </field>
