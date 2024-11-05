@@ -20,17 +20,16 @@ class ProjectTask(models.Model):
         records = self.env["project.task"].search([("project_id.use_project_no", "=", True), ("task_no", "=", False)])
         records._new_task_no()
 
-    @api.depends('name',"task_no") 
-    def _compute_display_name(self):
-            
+    #@api.depends('name',"task_no") 
+    def _compute_display_name(self):       
         for task in self:
-            if task.task_no and task.project_id.use_project_no:
-                if task.task_no not in task.name:
-                    task.display_name = f"[{task.task_no}] {task.name}"
-                    return
             task.display_name = f"{task.name}"
+            if task.task_no and task.project_id.use_project_no:
+                if task.task_no:
+                    task.display_name = f"[{task.task_no}] {task.name}"
+        
 
-    # def name_get(self):
+    # def _name_get(self):
     #     res_list = []
     #     for task in self:
     #         if task.task_no and task.project_id.use_project_no:

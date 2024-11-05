@@ -44,53 +44,12 @@ class ProjectProject(models.Model):
             if not record.project_no and record.use_project_no:
                 record.project_no = self.env["ir.sequence"].next_by_code("project.project")
         
-    @api.depends('name',"project_no") 
     def _compute_display_name(self):
-        
-        parameter = bool(self.env["ir.config_parameter"].sudo().get_param("project.project_sequence"))
-      
+        #parameter = bool(self.env["ir.config_parameter"].sudo().get_param("project.project_sequence"))
         for project in self:
-
-            if parameter:
-
-                if project.project_no and project.use_project_no:
-
-                    project.display_name = f"[{project.project_no}] {project.name}"
-                    return
-
-            project.display_name = f"{project.name}"
-    
-
-    # @api.depends('name',"project_no") 
-    # def _compute_display_name(self):
-        
-    #     parameter = bool(self.env["ir.config_parameter"].sudo().get_param("project.project_sequence"))
-      
-    #     for record in self:
-
-    #         _logger.error(f"{record=}")
-
-    #         if parameter:
-
-    #             if record.project_no and record.use_project_no:
-    #                 record.display_name = f"[{record.project_no}] {record.name}"
-
-    #         else:
-    #             record.display_name = f"{project.name}"
-
-    def name_get(self):
-        res_list = []
-        if bool(
-            self.env["ir.config_parameter"].sudo().get_param("project.project_sequence")
-        ):
-            for project in self:
-                if project.project_no and project.use_project_no:
-                    res_list.append((project.id, f"[{project.project_no}] {project.name}"))
-                else:
-                    res_list.append((project.id, f"{project.name}"))
-        else:
-            res_list = super(ProjectProject, self).name_get()
-        return res_list
+            project.display_name = project.name
+            if project.project_no and project.use_project_no:
+                project.display_name = f"[{project.project_no}] {project.name}"
 
     @api.model
     def search(self, args, offset=0, limit=80, order='id'):
