@@ -875,6 +875,7 @@
                         <group string="Sprint" name="sprint">
                             <field name="manhours" />
                             <field name="default_sprintduration" />
+                            <field name="date"/>
                         </group>
                     </page>
                 </page>
