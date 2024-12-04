@@ -61,7 +61,7 @@ class scrum_sprint(models.Model):
             else:
                 record.progress = 0
 
-    progress = fields.Float(compute="_progress", group_operator="avg", string='Progress (0-100)',
+    progress = fields.Float(compute="_progress", aggregator="avg", string='Progress (0-100)',
                             help="Computed as: Time Spent / Total Time.")
 
     def time_cal(self):
@@ -138,7 +138,7 @@ class scrum_sprint(models.Model):
 
     effective_hours = fields.Float(string='Effective hours', help="Computed using the sum of the task work done.",
                                    compute=_hours_get)
-    planned_hours = fields.Float(string='Planned Hours', group_operator="sum",
+    planned_hours = fields.Float(string='Planned Hours', aggregator="sum",
                                  help='Estimated time to do the task, usually set by the project manager when the task'
                                       'is in draft state.')
     state = fields.Selection([('draft', 'Draft'), ('open', 'Open'), ('pending', 'Pending'), ('cancel', 'Cancelled'),
@@ -206,15 +206,15 @@ class project_user_stories(models.Model):
         project_id = self.env.context.get('default_project_id')
         if not project_id:
             return False
-        return self.stage_find(project_id, [('fold', '=', False), ('is_closed', '=', False)])
+        return self.stage_find(project_id, [('fold', '=', False), ('active', '=', False)])
 
     @api.model
-    def _read_group_stage_ids(self, stages, domain, order):
+    def _read_group_stage_ids(self, stages, domain):
         search_domain = [('id', 'in', stages.ids)]
         if 'default_project_id' in self.env.context:
             search_domain = ['|', ('project_ids', '=', self.env.context['default_project_id'])] + search_domain
 
-        stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
+        stage_ids = stages._search(search_domain, order=stages._order)
         return stages.browse(stage_ids)
 
     @api.depends('project_id')
@@ -223,7 +223,7 @@ class project_user_stories(models.Model):
             if story.project_id:
                 if story.project_id not in story.stage_id.project_ids:
                     story.stage_id = story.stage_find(story.project_id.id, [
-                        ('fold', '=', False), ('is_closed', '=', False)])
+                        ('fold', '=', False), ('active', '=', False)])
             else:
                 story.stage_id = False
 
@@ -532,12 +532,12 @@ class project_task(models.Model):
     #     return stages.search([], order=order)
 
     @api.model
-    def _read_group_stage_ids(self, stages, domain, order):
+    def _read_group_stage_ids(self, stages, domain):
         search_domain = [('id', 'in', stages.ids)]
         if 'default_project_id' in self.env.context:
             search_domain = ['|', ('project_ids', '=', self.env.context['default_project_id'])] + search_domain
 
-        stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
+        stage_ids = stages._search(search_domain, order=stages._order)
         return stages.browse(stage_ids)
 
 

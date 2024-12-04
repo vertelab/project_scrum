@@ -107,7 +107,9 @@ More information:
         'security/project_security.xml',
         'data/project_scrum_data.xml',
        ],
-    'demo': ['demo/project_scrum_demo.xml'],
+    'demo': [
+        # 'demo/project_scrum_demo.xml' -- needs to be fixed
+    ],
     'installable': True,
 }
 
