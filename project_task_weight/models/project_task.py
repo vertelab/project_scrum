@@ -18,6 +18,15 @@ class ProjectTask(models.Model):
                 default='0',
                 help="This is a simple way to estimate the scope of a task")
 
+    @api.model_create_multi
+    def create(self, vals_list):
+
+        for val in vals_list:
+            if val["weight"] != 0:
+                val["allocated_hours"] = float(val["weight"])
+
+        return super(ProjectTask,self).create(vals_list)
+
     @api.onchange('weight')
     @api.depends('weight')
     def _weight(self):

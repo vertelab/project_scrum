@@ -21,12 +21,12 @@
 from odoo import models, fields, api, _
 import time
 from datetime import date, datetime, timedelta
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError
 import logging
 _logger = logging.getLogger(__name__)
 
 
-class Project(models.Model):
+class project(models.Model):
     _inherit = 'project.project'
 
     @api.model
@@ -34,7 +34,7 @@ class Project(models.Model):
         dmessage = []
         if not project.use_scrum:
             dmessage.append(_('Project %s is not a Scrum-project\n' % project.name))                
-        elif not project.date > '':
+        elif not project.date:
             dmessage.append(_('Project %s missing End Date\n' % project.name))
         elif project.manhours == 0:
             dmessage.append(_('Project %s missing Manhours\n' % project.name))
@@ -43,8 +43,8 @@ class Project(models.Model):
         elif project.sprint_ids and project.sprint_ids[-1].date_stop >= project.date:
             dmessage.append(_('Project %s has enough sprints\n' % project.name))
         if dmessage:
-            raise ValidationError(' '.join(dmessage))
-        
+            raise UserError(' '.join(dmessage))
+        #raise UserError("wat")
         sprints = []
         last_sprint = project.sprint_ids.sorted(lambda s: s.date_start)[-1] if project.sprint_ids else None
         _logger.debug('%s : %s' % (last_sprint,last_sprint.date_stop if last_sprint else None))
@@ -62,7 +62,7 @@ class Project(models.Model):
             }))
             date_stop = date_stop + timedelta(days=project.default_sprintduration)
         
-        res = self.env['ir.actions.act_window'].for_xml_id('project_scrum', 'action_ps_sprint_all')
+        res = self.env['ir.actions.act_window']._for_xml_id('project_scrum.action_ps_sprint_all')
         res['domain'] = "[('id','in',[" + ','.join(map(str, sprints)) + "])]"
         res['context'] = {
                 'search_default_project_id': project.id,

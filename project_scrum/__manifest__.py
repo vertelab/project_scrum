@@ -25,14 +25,14 @@
 
 {
     'name': 'Project Scrum: Scrum Module',
-    'version': '17.0.1.24.0',
+    'version': '1.24',
     # Version ledger: 14.0 = Odoo version. 1 = Major. Non regressionable code. 2 = Minor. New features that are regressionable. 3 = Bug fixes
     'summary': 'Using Scrum to plan the work in teams',
     'category': 'Project',
     #'sequence': '1',
     'author': 'Vertel AB',
     'website': 'https://vertel.se/apps/odoo-project_scrum/project_scrum',
-    'images': ['static/description/banner.png'], # 560x280 px.
+    'images': ['static/description/banner.png'],  # 560x280 px.
     'license': 'AGPL-3',
     'contributor': '',
     'maintainer': 'Vertel AB',
@@ -98,7 +98,7 @@ More information:
     """,
     'author': 'Vertel AB',
     'license': 'AGPL-3',
-    'depends': ['project', 'mail', 'hr_timesheet', 'sales_team'],  # project_category
+    'depends': ['project', 'mail', 'hr_timesheet', 'sales_team'],
     'data': [
         'views/project_scrum_view.xml',
         'wizard/project_scrum_test_task_view.xml',
