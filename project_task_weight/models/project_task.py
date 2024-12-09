@@ -20,12 +20,12 @@ class ProjectTask(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-
-        for val in vals_list:
-            if val["weight"] != 0:
-                val["allocated_hours"] = float(val["weight"])
-
-        return super(ProjectTask,self).create(vals_list)
+        task_ids = super(ProjectTask,self).create(vals_list)
+        for task_id in task_ids:
+            if task_id.weight != 0:
+                task_id.allocated_hours = float(task_id.weight)
+        return task_ids
+        
 
     @api.onchange('weight')
     @api.depends('weight')
